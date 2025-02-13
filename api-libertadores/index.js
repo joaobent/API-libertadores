@@ -2,9 +2,30 @@ import express from "express";
 import pool from "./servicos/conexao.js";
 import { retornaCampeonatos, retornaCampeonatosAno, retornaCampeonatosID, retornaCampeonatosTime } from "./servicos/retornaCampeonatos_servico.js";
 import { cadastraCampeonato } from "./servicos/cadastroCampeonato_servico.js";
+import { atualizaCampeonato } from "./servicos/atualizaCampeonato_servico.js";
 
 const app = express()
 app.use(express.json())
+
+app.put('/campeonatos/:id', async (req, res) =>{
+    const{id} = req.params;
+    const{campeao, vice, ano} = req.body
+
+    if (campeao == undefined || vice == undefined || ano == undefined) {
+        res.status(400).send("Nem Todos os campos foram atualizados")
+    } else {
+        const resultado = await atualizaCampeonato(id, campeao, vice, ano)
+        if (resultado.affectedRows > 0) {
+            res.status(202).send("Registro atualizado com sucesso")
+        } else {
+            res.status(400).send("Registro não encontrado!")
+        }
+    }
+
+
+    await atualizaCampeonato()
+
+})
 
 app.post('/campeonatos', async (req, res) =>{
     const campeao = req.body.campeao
